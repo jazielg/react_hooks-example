@@ -4,15 +4,19 @@ import React, {
   useEffect,
   useCallback,
   useRef,
+  useContext,
 } from "react";
 import PostItem from "./PostItem";
 import Input from "./Input";
+import { AuthContext } from "../context/AuthContextProvider";
 
 const PostList = () => {
   const [name, setName] = useState("");
   const [counter, setCounter] = useState(0);
 
   const nameRef = useRef(null);
+
+  const authContext = useContext(AuthContext);
 
   const fetchData = useCallback((type = "users") => {
     return fetch(`https://jsonplaceholder.typicode.com/${type}/1`)
@@ -38,6 +42,9 @@ const PostList = () => {
 
   return (
     <div>
+      <button onClick={() => authContext.setUser("Test3")}>Pro</button>
+      <p>{authContext.user.name}</p>
+
       <form>
         <Input
           ref={nameRef}
