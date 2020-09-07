@@ -5,44 +5,62 @@ import React, {
   useCallback,
   useRef,
   useContext,
+  useReducer,
 } from "react";
 import PostItem from "./PostItem";
 import Input from "./Input";
 import { AuthContext } from "../context/AuthContextProvider";
 
+const initialState = { count: 0 };
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "increment":
+      return { count: state.count + 1 };
+    case "decrement":
+      return { count: state.count - 1 };
+    default:
+      throw new Error();
+  }
+}
+
 const PostList = () => {
   const [name, setName] = useState("");
-  const [counter, setCounter] = useState(0);
 
+  // UseRef
   const nameRef = useRef(null);
 
+  // UseContext
   const authContext = useContext(AuthContext);
 
+  // UseReducer
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  // useCallback
   const fetchData = useCallback((type = "users") => {
     return fetch(`https://jsonplaceholder.typicode.com/${type}/1`)
       .then((response) => response.json())
       .then((json) => console.log(json));
   }, []);
 
+  // UseEffect
   useEffect(() => {
     // useRef, focus no campo name ao carregar a página.
     nameRef.current.focus();
 
-    // callback
     fetchData();
   }, [fetchData]);
 
-  /* Executa apenas uma vez ao iniciar a página; 
-    sem o useMemo, esse elemento será criado a cada alteração no estado (renderizando o elemento pai,
-    e ele será redenrizado novamente.
-  */
+  // UseMemo - Elemento não será criado a cada renderização
   const arrayData = useMemo(() => {
     return ["Post1", "Post2", "Post3"];
   }, []);
 
   return (
     <div>
-      <button onClick={() => authContext.setUser("Test3")}>Pro</button>
+      <button onClick={() => authContext.setUser("Test3")}>
+        Call authContext.setUser
+      </button>
       <p>{authContext.user.name}</p>
 
       <form>
@@ -54,8 +72,8 @@ const PostList = () => {
         />
       </form>
 
-      <button onClick={() => setCounter(counter + 1)}>Add counter</button>
-      <p>{counter}</p>
+      <button onClick={() => dispatch({ type: "increment" })}> + </button>
+      <p>{state.count}</p>
 
       <PostItem arrayData={arrayData} fetchData={fetchData} />
     </div>
